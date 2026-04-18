@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -26,11 +28,13 @@ export default function LoginPage() {
 
         if (error) {
           setMessage(error.message);
+          setLoading(false);
           return;
         }
 
         setMessage("Account created. You can now sign in.");
         setIsSignUp(false);
+        setLoading(false);
         return;
       }
 
@@ -41,14 +45,14 @@ export default function LoginPage() {
 
       if (error) {
         setMessage(error.message);
+        setLoading(false);
         return;
       }
 
-      window.location.href = "/";
+      router.replace("/");
     } catch (err) {
-      setMessage("Something went wrong. Please try again.");
       console.error(err);
-    } finally {
+      setMessage("Something went wrong. Please try again.");
       setLoading(false);
     }
   }
@@ -101,9 +105,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {message && (
-            <p className="text-sm text-red-600">{message}</p>
-          )}
+          {message && <p className="text-sm text-red-600">{message}</p>}
 
           <button
             type="submit"

@@ -1,138 +1,101 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import SignOutButton from "./sign-out-button";
 
-export default function LoginPage() {
+type UserEmail = string | null;
+
+export default function Home() {
+  const router = useRouter();
   const supabase = createClient();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<UserEmail>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
 
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (error) {
-          setMessage(error.message);
-          return;
-        }
-
-        setMessage("Account created. You can now sign in.");
-        setIsSignUp(false);
+      if (error || !user) {
+        router.replace("/login");
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setMessage(error.message);
-        return;
-      }
-
-      window.location.href = "/";
-    } catch (err) {
-      setMessage("Something went wrong. Please try again.");
-      console.error(err);
-    } finally {
+      setUserEmail(user.email ?? null);
       setLoading(false);
     }
+
+    checkUser();
+  }, [router, supabase]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="rounded-xl bg-white px-6 py-4 shadow text-gray-700">
+          Loading dashboard...
+        </div>
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back 👋
-        </h1>
+    <main className="min-h-screen bg-gray-100 p-4">
+      <div className="mx-auto max-w-[95%]">
+        <div className="mb-4 rounded-2xl bg-white p-4 shadow">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                X-System Dashboard
+              </h1>
 
-        <p className="mt-3 text-gray-600">
-          Access your exclusive dashboard and trading insights.
-        </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Shared dashboard PDF for trial viewing
+              </p>
 
-        <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-          <p className="font-semibold text-gray-800">What you get:</p>
-          <ul className="mt-2 list-disc pl-5 space-y-1">
-            <li>Daily updated dashboard PDF</li>
-            <li>Exclusive trading signals</li>
-          </ul>
+              <p className="text-sm text-gray-500">
+                Signed in as: {userEmail}
+              </p>
+
+              <p className="text-sm text-gray-500">
+                Last updated: April 17, 2026
+              </p>
+            </div>
+
+            <SignOutButton />
+          </div>
+
+          <div className="mt-3 flex gap-3">
+            <a
+              href="/dashboard.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+            >
+              Open Full PDF
+            </a>
+
+            <a
+              href="/dashboard.pdf"
+              download
+              className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              Download PDF
+            </a>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              className="w-full rounded-lg border px-3 py-2 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full rounded-lg border px-3 py-2 outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          {message && (
-            <p className="text-sm text-red-600">{message}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-70"
-          >
-            {loading
-              ? isSignUp
-                ? "Creating account..."
-                : "Signing in..."
-              : isSignUp
-              ? "Create account"
-              : "Sign in"}
-          </button>
-        </form>
-
-        <button
-          type="button"
-          onClick={() => {
-            setIsSignUp(!isSignUp);
-            setMessage("");
-          }}
-          disabled={loading}
-          className="mt-4 text-sm text-blue-600 underline disabled:opacity-70"
-        >
-          {isSignUp
-            ? "Already have an account? Sign in"
-            : "Need an account? Create one"}
-        </button>
+        <div className="rounded-2xl bg-white p-2 shadow">
+          <iframe
+            src="/dashboard.pdf"
+            title="Dashboard PDF"
+            className="w-full h-[95vh] rounded-xl border"
+          />
+        </div>
       </div>
     </main>
   );
