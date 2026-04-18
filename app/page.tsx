@@ -48,7 +48,6 @@ export default function LoginPage() {
           <strong>What you get:</strong>
           <ul className="list-disc pl-5 mt-2 space-y-1">
             <li>Daily updated dashboard PDF</li>
-            <li>Market structure insights</li>
             <li>Exclusive trading signals</li>
           </ul>
         </div>
