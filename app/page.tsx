@@ -1,71 +1,106 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "./sign-out-button";
+"use client";
 
-export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
-  if (!user) {
-    redirect("/login");
-  }
+export default function LoginPage() {
+  const supabase = createClient();
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push("/");
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4">
-      <div className="mx-auto max-w-[95%]">
-        <div className="mb-4 rounded-2xl bg-white p-4 shadow">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                X-System Dashboard
-              </h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
 
-              <p className="mt-1 text-sm text-gray-600">
-                Shared dashboard PDF for trial viewing
-              </p>
+        {/* 🔥 Welcome Message */}
+        <h1 className="text-2xl font-bold mb-2 text-gray-900">
+          Welcome back 👋
+        </h1>
 
-              <p className="text-sm text-gray-500">
-                Signed in as: {user.email}
-              </p>
+        <p className="text-gray-600 mb-6">
+          Access your exclusive dashboard and trading insights.
+        </p>
 
-              <p className="text-sm text-gray-500">
-                Last updated: April 17, 2026
-              </p>
-            </div>
-
-            <SignOutButton />
-          </div>
-
-          <div className="mt-3 flex gap-3">
-            <a
-              href="/dashboard.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
-            >
-              Open Full PDF
-            </a>
-
-            <a
-              href="/dashboard.pdf"
-              download
-              className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Download PDF
-            </a>
-          </div>
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-sm text-gray-600">
+          <strong>What you get:</strong>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li>Daily updated dashboard PDF</li>
+            <li>Market structure insights</li>
+            <li>Exclusive trading signals</li>
+          </ul>
         </div>
 
-        <div className="rounded-2xl bg-white p-2 shadow">
-          <iframe
-            src="/dashboard.pdf"
-            title="Dashboard PDF"
-            className="w-full h-[95vh] rounded-xl border"
-          />
-        </div>
+        {/* Form */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              className="w-full border rounded-lg px-3 py-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              className="w-full border rounded-lg px-3 py-2"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition"
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
+
+        <p className="text-sm text-gray-600 mt-6 text-center">
+          Need an account?{" "}
+          <a href="/signup" className="text-blue-600 underline">
+            Create one
+          </a>
+        </p>
       </div>
-    </main>
+    </div>
   );
 }
