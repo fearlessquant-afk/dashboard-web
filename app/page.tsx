@@ -2,104 +2,138 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleLogin = async (e: any) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
 
-    if (error) {
-      setError(error.message);
+        if (error) {
+          setMessage(error.message);
+          return;
+        }
+
+        setMessage("Account created. You can now sign in.");
+        setIsSignUp(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMessage(error.message);
+        return;
+      }
+
+      window.location.href = "/";
+    } catch (err) {
+      setMessage("Something went wrong. Please try again.");
+      console.error(err);
+    } finally {
       setLoading(false);
-    } else {
-      router.push("/");
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-
-        {/* 🔥 Welcome Message */}
-        <h1 className="text-2xl font-bold mb-2 text-gray-900">
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+        <h1 className="text-3xl font-bold text-gray-900">
           Welcome back 👋
         </h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="mt-3 text-gray-600">
           Access your exclusive dashboard and trading insights.
         </p>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-sm text-gray-600">
-          <strong>What you get:</strong>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
+        <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+          <p className="font-semibold text-gray-800">What you get:</p>
+          <ul className="mt-2 list-disc pl-5 space-y-1">
             <li>Daily updated dashboard PDF</li>
             <li>Exclusive trading signals</li>
           </ul>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
               type="email"
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full rounded-lg border px-3 py-2 outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
               type="password"
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full rounded-lg border px-3 py-2 outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
-          {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+          {message && (
+            <p className="text-sm text-red-600">{message}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition"
+            className="w-full rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading
+              ? isSignUp
+                ? "Creating account..."
+                : "Signing in..."
+              : isSignUp
+              ? "Create account"
+              : "Sign in"}
           </button>
         </form>
 
-        <p className="text-sm text-gray-600 mt-6 text-center">
-          Need an account?{" "}
-          <a href="/signup" className="text-blue-600 underline">
-            Create one
-          </a>
-        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setIsSignUp(!isSignUp);
+            setMessage("");
+          }}
+          disabled={loading}
+          className="mt-4 text-sm text-blue-600 underline disabled:opacity-70"
+        >
+          {isSignUp
+            ? "Already have an account? Sign in"
+            : "Need an account? Create one"}
+        </button>
       </div>
-    </div>
+    </main>
   );
 }
