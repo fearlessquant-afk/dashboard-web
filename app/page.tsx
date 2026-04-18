@@ -1,23 +1,43 @@
-export default function Home() {
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import SignOutButton from "./sign-out-button";
+
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <main className="min-h-screen bg-gray-100 p-4">
       <div className="mx-auto max-w-[95%]">
-        
-        {/* Header */}
         <div className="mb-4 rounded-2xl bg-white p-4 shadow">
-          <h1 className="text-2xl font-bold text-gray-900">
-            X-System Dashboard
-          </h1>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                X-System Dashboard
+              </h1>
 
-          <p className="mt-1 text-sm text-gray-600">
-            Shared dashboard PDF for trial viewing
-          </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Shared dashboard PDF for trial viewing
+              </p>
 
-          <p className="text-sm text-gray-500">
-            Last updated: April 17, 2026
-          </p>
+              <p className="text-sm text-gray-500">
+                Signed in as: {user.email}
+              </p>
 
-          {/* Actions */}
+              <p className="text-sm text-gray-500">
+                Last updated: April 17, 2026
+              </p>
+            </div>
+
+            <SignOutButton />
+          </div>
+
           <div className="mt-3 flex gap-3">
             <a
               href="/dashboard.pdf"
@@ -38,15 +58,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* PDF Viewer */}
         <div className="rounded-2xl bg-white p-2 shadow">
           <iframe
-            src="/dashboard.pdf#zoom=125"
+            src="/dashboard.pdf"
             title="Dashboard PDF"
             className="w-full h-[95vh] rounded-xl border"
           />
         </div>
-
       </div>
     </main>
   );
