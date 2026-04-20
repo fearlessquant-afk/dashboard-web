@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SignOutButton from "./sign-out-button";
@@ -33,6 +33,11 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
+  // force fresh PDF fetch on each page load
+  const pdfVersion = useMemo(() => Date.now(), []);
+  const dashboardPdf = `/dashboard.pdf?v=${pdfVersion}`;
+  const tradesPdf = `/trades.pdf?v=${pdfVersion}`;
+
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -46,8 +51,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100 p-4">
       <div className="mx-auto max-w-[95%]">
-
-        {/* ===== HEADER ===== */}
         <div className="mb-4 rounded-2xl bg-white p-4 shadow">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -64,77 +67,71 @@ export default function Home() {
               </p>
 
               <p className="text-sm text-gray-500">
-                Last updated: April 17, 2026
+                Last updated: April 19, 2026
               </p>
             </div>
 
             <SignOutButton />
           </div>
 
-          {/* ===== BUTTONS ===== */}
           <div className="mt-3 flex gap-3 flex-wrap">
-
-            {/* Dashboard */}
             <a
-              href="/dashboard.pdf"
+              href={dashboardPdf}
               target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
             >
               Open Dashboard
             </a>
 
             <a
-              href="/dashboard.pdf"
+              href={dashboardPdf}
               download
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Download Dashboard
             </a>
 
-            {/* Trades */}
             <a
-              href="/trades.pdf"
+              href={tradesPdf}
               target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
               Open Trades
             </a>
 
             <a
-              href="/trades.pdf"
+              href={tradesPdf}
               download
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Download Trades
             </a>
-
           </div>
         </div>
 
-        {/* ===== DASHBOARD VIEW ===== */}
         <div className="mb-6 rounded-2xl bg-white p-2 shadow">
           <h2 className="px-3 pt-2 text-lg font-semibold text-gray-800">
             Dashboard
           </h2>
           <iframe
-            src="/dashboard.pdf"
+            src={dashboardPdf}
             title="Dashboard PDF"
             className="w-full h-[80vh] rounded-xl border mt-2"
           />
         </div>
 
-        {/* ===== TRADES VIEW ===== */}
         <div className="rounded-2xl bg-white p-2 shadow">
           <h2 className="px-3 pt-2 text-lg font-semibold text-gray-800">
             Trades
           </h2>
           <iframe
-            src="/trades.pdf"
+            src={tradesPdf}
             title="Trades PDF"
             className="w-full h-[80vh] rounded-xl border mt-2"
           />
         </div>
-
       </div>
     </main>
   );
