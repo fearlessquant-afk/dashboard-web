@@ -39,7 +39,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchFileTimes() {
       try {
-        const res = await fetch("/api/file-time", { cache: "no-store" });
+        const res = await fetch(`/api/file-time?t=${Date.now()}`);
         const data = await res.json();
 
         if (data.dashboardLastModified) {
