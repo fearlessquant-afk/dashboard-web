@@ -13,6 +13,8 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<UserEmail>(null);
+  const [dashboardUpdated, setDashboardUpdated] = useState<string | null>(null);
+  const [tradesUpdated, setTradesUpdated] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkUser() {
@@ -33,7 +35,54 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
-  // force fresh PDF fetch on each page load
+  useEffect(() => {
+    async function fetchFileTimes() {
+      try {
+        const res = await fetch("/api/file-time", { cache: "no-store" });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch file times");
+        }
+
+        const data = await res.json();
+
+        if (data.dashboardLastModified) {
+          const date = new Date(data.dashboardLastModified);
+          setDashboardUpdated(
+            date.toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          );
+        }
+
+        if (data.tradesLastModified) {
+          const date = new Date(data.tradesLastModified);
+          setTradesUpdated(
+            date.toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching file times:", error);
+        setDashboardUpdated("Unavailable");
+        setTradesUpdated("Unavailable");
+      }
+    }
+
+    fetchFileTimes();
+  }, []);
+
   const pdfVersion = useMemo(() => Date.now(), []);
   const dashboardPdf = `/dashboard.pdf?v=${pdfVersion}`;
   const tradesPdf = `/trades.pdf?v=${pdfVersion}`;
@@ -67,7 +116,11 @@ export default function Home() {
               </p>
 
               <p className="text-sm text-gray-500">
-                Last updated: April 19, 2026
+                Dashboard updated: {dashboardUpdated ?? "Loading..."}
+              </p>
+
+              <p className="text-sm text-gray-500">
+                Trades updated: {tradesUpdated ?? "Loading..."}
               </p>
             </div>
 
