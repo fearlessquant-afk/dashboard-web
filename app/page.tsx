@@ -46,6 +46,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100 p-4">
       <div className="mx-auto max-w-[95%]">
+
+        {/* ===== HEADER ===== */}
         <div className="mb-4 rounded-2xl bg-white p-4 shadow">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -69,14 +71,16 @@ export default function Home() {
             <SignOutButton />
           </div>
 
-          <div className="mt-3 flex gap-3">
+          {/* ===== BUTTONS ===== */}
+          <div className="mt-3 flex gap-3 flex-wrap">
+
+            {/* Dashboard */}
             <a
               href="/dashboard.pdf"
               target="_blank"
-              rel="noopener noreferrer"
               className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
             >
-              Open Full PDF
+              Open Dashboard
             </a>
 
             <a
@@ -84,18 +88,53 @@ export default function Home() {
               download
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Download PDF
+              Download Dashboard
             </a>
+
+            {/* Trades */}
+            <a
+              href="/trades.pdf"
+              target="_blank"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            >
+              Open Trades
+            </a>
+
+            <a
+              href="/trades.pdf"
+              download
+              className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              Download Trades
+            </a>
+
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-2 shadow">
+        {/* ===== DASHBOARD VIEW ===== */}
+        <div className="mb-6 rounded-2xl bg-white p-2 shadow">
+          <h2 className="px-3 pt-2 text-lg font-semibold text-gray-800">
+            Dashboard
+          </h2>
           <iframe
             src="/dashboard.pdf"
             title="Dashboard PDF"
-            className="w-full h-[95vh] rounded-xl border"
+            className="w-full h-[80vh] rounded-xl border mt-2"
           />
         </div>
+
+        {/* ===== TRADES VIEW ===== */}
+        <div className="rounded-2xl bg-white p-2 shadow">
+          <h2 className="px-3 pt-2 text-lg font-semibold text-gray-800">
+            Trades
+          </h2>
+          <iframe
+            src="/trades.pdf"
+            title="Trades PDF"
+            className="w-full h-[80vh] rounded-xl border mt-2"
+          />
+        </div>
+
       </div>
     </main>
   );
