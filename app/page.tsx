@@ -15,6 +15,7 @@ export default function Home() {
   const [userEmail, setUserEmail] = useState<UserEmail>(null);
   const [dashboardUpdated, setDashboardUpdated] = useState<string | null>(null);
   const [tradesUpdated, setTradesUpdated] = useState<string | null>(null);
+  const [rawApi, setRawApi] = useState<string>("");
 
   useEffect(() => {
     async function checkUser() {
@@ -35,12 +36,13 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
-  // ✅ fetch file modified time
   useEffect(() => {
     async function fetchFileTimes() {
       try {
-        const res = await fetch(`/api/file-time?t=${Date.now()}`);
+        const res = await fetch(`/api/file-time2?t=${Date.now()}`);
         const data = await res.json();
+
+        setRawApi(JSON.stringify(data));
 
         if (data.dashboardLastModified) {
           const date = new Date(Number(data.dashboardLastModified));
@@ -77,13 +79,13 @@ export default function Home() {
         console.error("Error fetching file times:", error);
         setDashboardUpdated("Unavailable");
         setTradesUpdated("Unavailable");
+        setRawApi("fetch failed");
       }
     }
 
     fetchFileTimes();
   }, []);
 
-  // force PDF refresh
   const pdfVersion = useMemo(() => Date.now(), []);
   const dashboardPdf = `/dashboard.pdf?v=${pdfVersion}`;
   const tradesPdf = `/trades.pdf?v=${pdfVersion}`;
@@ -122,6 +124,10 @@ export default function Home() {
 
               <p className="text-sm text-gray-500">
                 Trades updated: {tradesUpdated ?? "Loading..."}
+              </p>
+
+              <p className="text-sm text-red-500 break-all">
+                Raw API: {rawApi}
               </p>
             </div>
 
