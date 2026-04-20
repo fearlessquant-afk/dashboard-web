@@ -1,27 +1,20 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const dashboardPath = path.join(process.cwd(), "public", "dashboard.pdf");
-    const tradesPath = path.join(process.cwd(), "public", "trades.pdf");
+    const url = "https://dashboard-web-kohl-alpha.vercel.app/dashboard.pdf";
 
-    const dashboardStats = fs.statSync(dashboardPath);
-    const tradesStats = fs.statSync(tradesPath);
+    const res = await fetch(url, { method: "HEAD" });
+
+    const lastModified = res.headers.get("last-modified");
 
     return NextResponse.json({
-      dashboardLastModified: dashboardStats.mtimeMs,
-      tradesLastModified: tradesStats.mtimeMs,
+      dashboardLastModified: lastModified,
     });
   } catch (error) {
-    console.error("Error reading file times:", error);
-
-    return NextResponse.json(
-      { error: "Failed to read PDF file time." },
-      { status: 500 }
-    );
+    console.error(error);
+    return NextResponse.json({ error: "fail" }, { status: 500 });
   }
 }
