@@ -6,18 +6,12 @@ export async function GET() {
   try {
     const dashboardRes = await fetch(
       "https://dashboard-web-kohl-alpha.vercel.app/dashboard.pdf",
-      {
-        method: "HEAD",
-        cache: "no-store",
-      }
+      { method: "HEAD", cache: "no-store" }
     );
 
     const tradesRes = await fetch(
       "https://dashboard-web-kohl-alpha.vercel.app/trades.pdf",
-      {
-        method: "HEAD",
-        cache: "no-store",
-      }
+      { method: "HEAD", cache: "no-store" }
     );
 
     return NextResponse.json({
@@ -25,10 +19,9 @@ export async function GET() {
       tradesLastModified: tradesRes.headers.get("last-modified"),
     });
   } catch (error) {
-    console.error("Error reading live PDF headers:", error);
-
+    console.error("Error reading PDF headers:", error);
     return NextResponse.json(
-      { error: "Failed to read PDF header time." },
+      { error: "Failed to read PDF time" },
       { status: 500 }
     );
   }

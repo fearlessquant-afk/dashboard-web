@@ -36,6 +36,7 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
+  // ✅ Fetch + convert to Pacific Time
   useEffect(() => {
     async function fetchFileTimes() {
       try {
@@ -44,37 +45,26 @@ export default function Home() {
 
         setRawApi(JSON.stringify(data));
 
-        if (data.dashboardLastModified) {
-          const date = new Date(Number(data.dashboardLastModified));
+        function formatToPacific(dateStr: string | null) {
+          if (!dateStr) return "Unavailable";
 
-          setDashboardUpdated(
-            date.toLocaleString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: true,
-            })
-          );
+          const date = new Date(dateStr);
+          if (isNaN(date.getTime())) return "Invalid Date";
+
+          return date.toLocaleString("en-US", {
+            timeZone: "America/Los_Angeles", // ⭐ Pacific Time
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+          });
         }
 
-        if (data.tradesLastModified) {
-          const date = new Date(Number(data.tradesLastModified));
-
-          setTradesUpdated(
-            date.toLocaleString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: true,
-            })
-          );
-        }
+        setDashboardUpdated(formatToPacific(data.dashboardLastModified));
+        setTradesUpdated(formatToPacific(data.tradesLastModified));
       } catch (error) {
         console.error("Error fetching file times:", error);
         setDashboardUpdated("Unavailable");
@@ -119,11 +109,11 @@ export default function Home() {
               </p>
 
               <p className="text-sm text-gray-500">
-                Dashboard updated: {dashboardUpdated ?? "Loading..."}
+                Dashboard updated: {dashboardUpdated}
               </p>
 
               <p className="text-sm text-gray-500">
-                Trades updated: {tradesUpdated ?? "Loading..."}
+                Trades updated: {tradesUpdated}
               </p>
 
               <p className="text-sm text-red-500 break-all">
