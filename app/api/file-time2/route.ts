@@ -4,17 +4,32 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const url = "https://dashboard-web-kohl-alpha.vercel.app/dashboard.pdf";
+    const dashboardRes = await fetch(
+      "https://dashboard-web-kohl-alpha.vercel.app/dashboard.pdf",
+      {
+        method: "HEAD",
+        cache: "no-store",
+      }
+    );
 
-    const res = await fetch(url, { method: "HEAD" });
-
-    const lastModified = res.headers.get("last-modified");
+    const tradesRes = await fetch(
+      "https://dashboard-web-kohl-alpha.vercel.app/trades.pdf",
+      {
+        method: "HEAD",
+        cache: "no-store",
+      }
+    );
 
     return NextResponse.json({
-      dashboardLastModified: lastModified,
+      dashboardLastModified: dashboardRes.headers.get("last-modified"),
+      tradesLastModified: tradesRes.headers.get("last-modified"),
     });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "fail" }, { status: 500 });
+    console.error("Error reading live PDF headers:", error);
+
+    return NextResponse.json(
+      { error: "Failed to read PDF header time." },
+      { status: 500 }
+    );
   }
 }
