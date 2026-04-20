@@ -35,19 +35,19 @@ export default function Home() {
   }, [router, supabase]);
 
   useEffect(() => {
-    async function fetchFileTimes() {
+    async function fetchTradesTime() {
       try {
         const res = await fetch(`/api/file-time2?t=${Date.now()}`);
         const data = await res.json();
 
         setTradesUpdated(data.tradesLastModified ?? "Unavailable");
       } catch (error) {
-        console.error("Error fetching file times:", error);
+        console.error("Error fetching trades update time:", error);
         setTradesUpdated("Unavailable");
       }
     }
 
-    fetchFileTimes();
+    fetchTradesTime();
   }, []);
 
   const pdfVersion = useMemo(() => Date.now(), []);
