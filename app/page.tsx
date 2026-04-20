@@ -35,19 +35,16 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
+  // ✅ fetch file modified time
   useEffect(() => {
     async function fetchFileTimes() {
       try {
         const res = await fetch("/api/file-time", { cache: "no-store" });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch file times");
-        }
-
         const data = await res.json();
 
         if (data.dashboardLastModified) {
-          const date = new Date(data.dashboardLastModified);
+          const date = new Date(Number(data.dashboardLastModified));
+
           setDashboardUpdated(
             date.toLocaleString("en-US", {
               year: "numeric",
@@ -56,12 +53,14 @@ export default function Home() {
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
+              hour12: true,
             })
           );
         }
 
         if (data.tradesLastModified) {
-          const date = new Date(data.tradesLastModified);
+          const date = new Date(Number(data.tradesLastModified));
+
           setTradesUpdated(
             date.toLocaleString("en-US", {
               year: "numeric",
@@ -70,6 +69,7 @@ export default function Home() {
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
+              hour12: true,
             })
           );
         }
@@ -83,6 +83,7 @@ export default function Home() {
     fetchFileTimes();
   }, []);
 
+  // force PDF refresh
   const pdfVersion = useMemo(() => Date.now(), []);
   const dashboardPdf = `/dashboard.pdf?v=${pdfVersion}`;
   const tradesPdf = `/trades.pdf?v=${pdfVersion}`;

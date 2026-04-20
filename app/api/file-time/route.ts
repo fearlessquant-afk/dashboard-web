@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+// prevent caching (important)
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const dashboardPath = path.join(process.cwd(), "public", "dashboard.pdf");
@@ -11,8 +14,8 @@ export async function GET() {
     const tradesStats = fs.statSync(tradesPath);
 
     return NextResponse.json({
-      dashboardLastModified: dashboardStats.mtime.toISOString(),
-      tradesLastModified: tradesStats.mtime.toISOString(),
+      dashboardLastModified: dashboardStats.mtimeMs, // ✅ number
+      tradesLastModified: tradesStats.mtimeMs,       // ✅ number
     });
   } catch (error) {
     console.error("Error reading file times:", error);
