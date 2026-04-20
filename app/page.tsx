@@ -13,9 +13,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<UserEmail>(null);
-  const [dashboardUpdated, setDashboardUpdated] = useState<string | null>(null);
   const [tradesUpdated, setTradesUpdated] = useState<string | null>(null);
-  const [rawApi, setRawApi] = useState<string>("");
 
   useEffect(() => {
     async function checkUser() {
@@ -36,40 +34,16 @@ export default function Home() {
     checkUser();
   }, [router, supabase]);
 
-  // ✅ Fetch + convert to Pacific Time
   useEffect(() => {
     async function fetchFileTimes() {
       try {
         const res = await fetch(`/api/file-time2?t=${Date.now()}`);
         const data = await res.json();
 
-        setRawApi(JSON.stringify(data));
-
-        function formatToPacific(dateStr: string | null) {
-          if (!dateStr) return "Unavailable";
-
-          const date = new Date(dateStr);
-          if (isNaN(date.getTime())) return "Invalid Date";
-
-          return date.toLocaleString("en-US", {
-            timeZone: "America/Los_Angeles", // ⭐ Pacific Time
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: true,
-          });
-        }
-
-        setDashboardUpdated(formatToPacific(data.dashboardLastModified));
-        setTradesUpdated(formatToPacific(data.tradesLastModified));
+        setTradesUpdated(data.tradesLastModified ?? "Unavailable");
       } catch (error) {
         console.error("Error fetching file times:", error);
-        setDashboardUpdated("Unavailable");
         setTradesUpdated("Unavailable");
-        setRawApi("fetch failed");
       }
     }
 
@@ -109,15 +83,7 @@ export default function Home() {
               </p>
 
               <p className="text-sm text-gray-500">
-                Dashboard updated: {dashboardUpdated}
-              </p>
-
-              <p className="text-sm text-gray-500">
-                Trades updated: {tradesUpdated}
-              </p>
-
-              <p className="text-sm text-red-500 break-all">
-                Raw API: {rawApi}
+                Trades updated: {tradesUpdated ?? "Loading..."}
               </p>
             </div>
 

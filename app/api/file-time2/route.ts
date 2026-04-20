@@ -1,27 +1,24 @@
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const dashboardRes = await fetch(
-      "https://dashboard-web-kohl-alpha.vercel.app/dashboard.pdf",
-      { method: "HEAD", cache: "no-store" }
-    );
-
-    const tradesRes = await fetch(
-      "https://dashboard-web-kohl-alpha.vercel.app/trades.pdf",
-      { method: "HEAD", cache: "no-store" }
+    const tradesUpdated = fs.readFileSync(
+      path.join(process.cwd(), "public", "trades-updated.txt"),
+      "utf8"
     );
 
     return NextResponse.json({
-      dashboardLastModified: dashboardRes.headers.get("last-modified"),
-      tradesLastModified: tradesRes.headers.get("last-modified"),
+      tradesLastModified: tradesUpdated.trim(),
     });
   } catch (error) {
-    console.error("Error reading PDF headers:", error);
+    console.error("Error reading trades update time:", error);
+
     return NextResponse.json(
-      { error: "Failed to read PDF time" },
+      { error: "Failed to read trades update time." },
       { status: 500 }
     );
   }
