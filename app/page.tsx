@@ -28,6 +28,17 @@ export default function Home() {
       }
 
       setUserEmail(user.email ?? null);
+
+      // Log every signed-in user's visit
+      try {
+        await supabase.from("user_visits").insert({
+          email: user.email,
+          visited_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error("Error logging user visit:", err);
+      }
+
       setLoading(false);
     }
 
