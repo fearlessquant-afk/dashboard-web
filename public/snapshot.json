@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "system_name": "X-System Portfolio",
   "system_version": "2026.04",
-  "generated_at": "2026-04-27T12:58:50.689550-07:00",
+  "generated_at": "2026-04-27T14:23:39.578537-07:00",
   "timezone": "America/Los_Angeles",
   "trade_date": "2026-04-27",
   "execution_after": "2026-04-27T13:00:00-07:00",
@@ -11,14 +11,9 @@
   "signal": "50% Long",
   "raw_signal": "50% Long",
   "signal_fraction": 0.5,
-  "strategy_equity": 30000.0,
-  "base_max_contracts": 4,
-  "max_contracts": 4,
-  "target_position": 2,
-  "target_position_text": "2 MES Long",
   "source": {
     "sheet_name": "Trades",
     "sheet_row": 3358,
-    "sheet_total_equity": 4.906340175872868
+    "sheet_total_equity": 4.905505942205385
   }
 }
