@@ -2,7 +2,7 @@
   "schema_version": 2,
   "system_name": "X-System Portfolio",
   "system_version": "2026.04",
-  "generated_at": "2026-05-28T13:02:02.379287-07:00",
+  "generated_at": "2026-05-28T13:24:33.066216-07:00",
   "timezone": "America/Los_Angeles",
   "trade_date": "2026-05-28",
   "execution_after": "2026-05-28T13:00:00-07:00",
@@ -14,6 +14,6 @@
   "source": {
     "sheet_name": "Trades",
     "sheet_row": 3380,
-    "sheet_total_equity": 5.172118816755788
+    "sheet_total_equity": 5.17199573309993
   }
 }
