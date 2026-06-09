@@ -2,18 +2,18 @@
   "schema_version": 2,
   "system_name": "X-System Portfolio",
   "system_version": "2026.04",
-  "generated_at": "2026-06-08T13:24:30.862567-07:00",
+  "generated_at": "2026-06-09T10:03:20.997611-07:00",
   "timezone": "America/Los_Angeles",
-  "trade_date": "2026-06-08",
-  "execution_after": "2026-06-08T13:00:00-07:00",
-  "expires_at": "2026-06-08T23:59:00-07:00",
+  "trade_date": "2026-06-09",
+  "execution_after": "2026-06-09T13:00:00-07:00",
+  "expires_at": "2026-06-09T23:59:00-07:00",
   "instrument": "MES",
   "signal": "25% Long",
   "raw_signal": "25% Long",
   "signal_fraction": 0.25,
   "source": {
     "sheet_name": "Trades",
-    "sheet_row": 3387,
-    "sheet_total_equity": 5.064024014988852
+    "sheet_row": 3388,
+    "sheet_total_equity": 4.97886380109681
   }
 }
